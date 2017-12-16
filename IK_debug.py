@@ -2,6 +2,8 @@ from sympy import *
 from time import time
 from mpmath import radians
 import tf
+import numpy as np
+from sympy.matrices import Matrix
 
 '''
 Format of test case is [ [[EE position],[EE orientation as quaternions]],[WC location],[joint angles]]
@@ -58,12 +60,12 @@ def test_code(test_case):
 
     req = Pose(comb)
     start_time = time()
-    
+
     ########################################################################################
-    ## 
+    ##
 
     ## Insert IK code here!
-    
+
     theta1 = 0
     theta2 = 0
     theta3 = 0
@@ -71,14 +73,77 @@ def test_code(test_case):
     theta5 = 0
     theta6 = 0
 
-    ## 
+    ##
     ########################################################################################
-    
+
     ########################################################################################
     ## For additional debugging add your forward kinematics here. Use your previously calculated thetas
     ## as the input and output the position of your end effector as your_ee = [x,y,z]
 
-    ## (OPTIONAL) YOUR CODE HERE!
+    th1, th2, th3, th4, th5, th6, th7 = symbols('th1:8') # joint variables
+    a0, a1, a2, a3, a4, a5, a6 = symbols('a0:7') # twist angles
+    d1, d2, d3, d4, d5, d6, d7 = symbols('d1:8') # link offests
+    r0, r1, r2, r3, r4, r5, r6 = symbols('r0:7') # link lenghts
+
+    s = {
+      th1: 0,     a0: 0,     d1: 0.75,  r0: 0,
+      th2: -pi/2, a1: -pi/2, d2: 0,     r1: 0.35,
+      th3: 0,     a2: 0,     d3: 0,     r2: 1.25,
+      th4: 0,     a3: -pi/2, d4: 1.5,   r3: -0.054,
+      th5: 0,     a4: pi/2,  d5: 0,     r4: 0,
+      th6: 0,     a5: -pi/2, d6: 0,     r5: 0,
+      th7: 0,     a6: 0,     d7: 0.303, r6: 0,
+    }
+
+    def htm(th, a, d, r):
+        return Matrix([[cos(th), -sin(th), 0, r],
+                       [sin(th)*cos(a), cos(th)*cos(a), -sin(a), -sin(a)*d],
+                       [sin(th)*sin(a), cos(th)*sin(a), cos(a), cos(a)*d],
+                       [0, 0, 0, 1]])
+
+    T0_1 = htm(th1, a0, d1, r0).subs(s)
+    T1_2 = htm(th2, a1, d2, r1).subs(s)
+    T2_3 = htm(th3, a2, d3, r2).subs(s)
+    T3_4 = htm(th4, a3, d4, r3).subs(s)
+    T4_5 = htm(th5, a4, d5, r4).subs(s)
+    T5_6 = htm(th6, a5, d6, r5).subs(s)
+    T6_G = htm(th7, a6, d7, r6).subs(s)
+
+    T0_2 = simplify(T0_1 * T1_2)
+    T0_3 = simplify(T0_2 * T2_3)
+    T0_4 = simplify(T0_3 * T3_4)
+    T0_5 = simplify(T0_4 * T4_5)
+    T0_6 = simplify(T0_5 * T5_6)
+    T0_G = simplify(T0_6 * T6_G)
+
+    R_z = Matrix([[cos(pi), -sin(pi), 0, 0],
+                  [sin(pi),  cos(pi), 0, 0],
+                  [0,  0, 1, 0],
+                  [0,  0, 0, 1]])
+    R_y = Matrix([[cos(-pi/2), 0, sin(-pi/2), 0],
+                  [0,  1, 0, 0],
+                  [-sin(-pi/2),  0, cos(-pi/2), 0],
+                  [0,  0, 0, 1]])
+    R_corr = simplify(R_z, R_y)
+
+    T_total = simplify(T0_G * R_corr)
+
+    subs = {
+        th1: 0,
+        th2: 0,
+        th3: 0,
+        th4: 0,
+        th5: 0,
+        th6: 0,
+    }
+    print('T0_1', T0_1.evalf(subs=subs))
+    print('T0_2', T0_2.evalf(subs=subs))
+    print('T0_3', T0_3.evalf(subs=subs))
+    print('T0_4', T0_4.evalf(subs=subs))
+    print('T0_5', T0_5.evalf(subs=subs))
+    print('T0_6', T0_6.evalf(subs=subs))
+    print('T0_G', T0_G.evalf(subs=subs))
+    print('total', T_total.evalf(subs=subs))
 
     ## End your code input for forward kinematics here!
     ########################################################################################
