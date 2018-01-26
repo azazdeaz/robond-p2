@@ -4,6 +4,7 @@ from mpmath import radians
 import tf
 import numpy as np
 from sympy.matrices import Matrix
+from sympy import atan2, sqrt
 
 '''
 Format of test case is [ [[EE position],[EE orientation as quaternions]],[WC location],[joint angles]]
@@ -66,12 +67,12 @@ def test_code(test_case):
 
     ## Insert IK code here!
 
-    theta1 = 0
-    theta2 = 0
-    theta3 = 0
-    theta4 = 0
-    theta5 = 0
-    theta6 = 0
+    theta1 = test_case[2][0]
+    theta2 = test_case[2][1]
+    theta3 = test_case[2][2]
+    theta4 = test_case[2][3]
+    theta5 = test_case[2][4]
+    theta6 = test_case[2][5]
 
     ##
     ########################################################################################
@@ -86,13 +87,13 @@ def test_code(test_case):
     r0, r1, r2, r3, r4, r5, r6 = symbols('r0:7') # link lenghts
 
     s = {
-      th1: 0,     a0: 0,     d1: 0.75,  r0: 0,
-      th2: -pi/2, a1: -pi/2, d2: 0,     r1: 0.35,
-      th3: 0,     a2: 0,     d3: 0,     r2: 1.25,
-      th4: 0,     a3: -pi/2, d4: 1.5,   r3: -0.054,
-      th5: 0,     a4: pi/2,  d5: 0,     r4: 0,
-      th6: 0,     a5: -pi/2, d6: 0,     r5: 0,
-      th7: 0,     a6: 0,     d7: 0.303, r6: 0,
+      th1: theta1,        a0: 0,     d1: 0.75,  r0: 0,
+      th2: theta2 - pi/2, a1: -pi/2, d2: 0,     r1: 0.35,
+      th3: theta3,        a2: 0,     d3: 0,     r2: 1.25,
+      th4: theta4,        a3: -pi/2, d4: 1.5,   r3: -0.054,
+      th5: theta5,        a4: pi/2,  d5: 0,     r4: 0,
+      th6: theta6,        a5: -pi/2, d6: 0,     r5: 0,
+      th7: 0,             a6: 0,     d7: 0.303, r6: 0,
     }
 
     def htm(th, a, d, r):
@@ -145,12 +146,19 @@ def test_code(test_case):
     print('T0_G', T0_G.evalf(subs=subs))
     print('total', T_total.evalf(subs=subs))
 
+    FK_END = T_total.evalf(subs=subs)
+    alpha = atan2(FK_END[1,0], FK_END[0,0])
+    beta = atan2(FK_END[2,0], sqrt(FK_END[1,0]+FK_END[0,0]))
+    gamma = atan2(FK_END[2,1], FK_END[2,2])
+    print('alpha', alpha)
+    print('beta', beta)
+    print('gamma', gamma)
     ## End your code input for forward kinematics here!
     ########################################################################################
 
     ## For error analysis please set the following variables of your WC location and EE location in the format of [x,y,z]
     your_wc = [1,1,1] # <--- Load your calculated WC values in this array
-    your_ee = [1,1,1] # <--- Load your calculated end effector value from your forward kinematics
+    your_ee = [FK_END[0,3],FK_END[1,3],FK_END[2,3]] # <--- Load your calculated end effector value from your forward kinematics
     ########################################################################################
 
     ## Error analysis
@@ -191,9 +199,9 @@ def test_code(test_case):
         ee_y_e = abs(your_ee[1]-test_case[0][0][1])
         ee_z_e = abs(your_ee[2]-test_case[0][0][2])
         ee_offset = sqrt(ee_x_e**2 + ee_y_e**2 + ee_z_e**2)
-        print ("\nEnd effector error for x position is: %04.8f" % ee_x_e)
-        print ("End effector error for y position is: %04.8f" % ee_y_e)
-        print ("End effector error for z position is: %04.8f" % ee_z_e)
+        print ("\nEnd effector error for x position is: %04.8f (%04.8f - %04.8f)" % (ee_x_e, your_ee[0], test_case[0][0][0]))
+        print ("End effector error for y position is: %04.8f (%04.8f - %04.8f)" % (ee_y_e, your_ee[1], test_case[0][0][1]))
+        print ("End effector error for z position is: %04.8f (%04.8f - %04.8f)" % (ee_z_e, your_ee[2], test_case[0][0][2]))
         print ("Overall end effector offset is: %04.8f units \n" % ee_offset)
 
 
@@ -201,6 +209,6 @@ def test_code(test_case):
 
 if __name__ == "__main__":
     # Change test case number for different scenarios
-    test_case_number = 1
+    test_case_number = 2
 
     test_code(test_cases[test_case_number])
