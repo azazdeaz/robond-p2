@@ -146,19 +146,25 @@ def test_code(test_case):
     print('T0_G', T0_G.evalf(subs=subs))
     print('total', T_total.evalf(subs=subs))
 
-    FK_END = T_total.evalf(subs=subs)
-    alpha = atan2(FK_END[1,0], FK_END[0,0])
-    beta = atan2(FK_END[2,0], sqrt(FK_END[1,0]+FK_END[0,0]))
-    gamma = atan2(FK_END[2,1], FK_END[2,2])
+    EE = T_total.evalf(subs=subs)
+    alpha = atan2(EE[1,0], EE[0,0])
+    beta = atan2(EE[2,0], sqrt(EE[1,0]+EE[0,0]))
+    gamma = atan2(EE[2,1], EE[2,2])
     print('alpha', alpha)
     print('beta', beta)
     print('gamma', gamma)
+
+    offset = 0.303
+    print('offset', offset)
+    wc_x = EE[0,3] - offset * EE[0,2]
+    wc_y = EE[1,3] - offset * EE[1,2]
+    wc_z = EE[2,3] - offset * EE[2,2]
     ## End your code input for forward kinematics here!
     ########################################################################################
 
     ## For error analysis please set the following variables of your WC location and EE location in the format of [x,y,z]
-    your_wc = [1,1,1] # <--- Load your calculated WC values in this array
-    your_ee = [FK_END[0,3],FK_END[1,3],FK_END[2,3]] # <--- Load your calculated end effector value from your forward kinematics
+    your_wc = [wc_x, wc_y, wc_z] # <--- Load your calculated WC values in this array
+    your_ee = [EE[0,3],EE[1,3],EE[2,3]] # <--- Load your calculated end effector value from your forward kinematics
     ########################################################################################
 
     ## Error analysis
@@ -170,9 +176,9 @@ def test_code(test_case):
         wc_y_e = abs(your_wc[1]-test_case[1][1])
         wc_z_e = abs(your_wc[2]-test_case[1][2])
         wc_offset = sqrt(wc_x_e**2 + wc_y_e**2 + wc_z_e**2)
-        print ("\nWrist error for x position is: %04.8f" % wc_x_e)
-        print ("Wrist error for y position is: %04.8f" % wc_y_e)
-        print ("Wrist error for z position is: %04.8f" % wc_z_e)
+        print ("\nWrist error for x position is: %04.8f (%04.8f - %04.8f)" % (wc_x_e, your_wc[0], test_case[1][0]))
+        print ("Wrist error for y position is: %04.8f (%04.8f - %04.8f)" % (wc_y_e, your_wc[1], test_case[1][1]))
+        print ("Wrist error for z position is: %04.8f (%04.8f - %04.8f)" % (wc_z_e, your_wc[2], test_case[1][2]))
         print ("Overall wrist offset is: %04.8f units" % wc_offset)
 
     # Find theta errors
