@@ -67,17 +67,46 @@ def test_code(test_case):
 
     ## Insert IK code here!
 
-    theta1 = test_case[2][0]
-    theta2 = test_case[2][1]
-    theta3 = test_case[2][2]
-    theta4 = test_case[2][3]
-    theta5 = test_case[2][4]
-    theta6 = test_case[2][5]
+    DH = {
+      'th1': 0,     'a0': 0,     'd1': 0.75,  'r0': 0,
+      'th2': -pi/2, 'a1': -pi/2, 'd2': 0,     'r1': 0.35,
+      'th3': 0,     'a2': 0,     'd3': 0,     'r2': 1.25,
+      'th4': 0,     'a3': -pi/2, 'd4': 1.5,   'r3': -0.054,
+      'th5': 0,     'a4': pi/2,  'd5': 0,     'r4': 0,
+      'th6': 0,     'a5': -pi/2, 'd6': 0,     'r5': 0,
+      'th7': 0,     'a6': 0,     'd7': 0.303, 'r6': 0,
+    }
+
+    def loc(a, b, c):
+        print('abc',a,b,c)
+        rad = np.arccos((a**2 + b**2 - c**2) / (2 * a * b))
+        return rad
+    wc_z = test_case[1][2] - DH['d1']
+    wc_xy = np.sqrt(test_case[1][0]**2 + test_case[1][1]**2) - DH['r1']
+    wc_distance = np.sqrt(wc_xy ** 2 + (wc_z) ** 2)
+
+    theta1 = np.arctan2(test_case[1][1],test_case[1][0])
+
+    alpha_a = np.arctan2(wc_z, wc_xy)
+    alpha_b = loc(DH['r2'], wc_distance, DH['d4'])
+    theta2 = -((alpha_a + alpha_b) + DH['th2'])
+    theta3 = -(loc(DH['d4'], DH['r2'], wc_distance) - np.pi/2)
+    theta4 = 0
+    theta5 = 0
+    theta6 = 0
 
     ##
     ########################################################################################
 
     ########################################################################################
+    ## uncomment for testing FK only
+    # theta1 = test_case[2][0]
+    # theta2 = test_case[2][1]
+    # theta3 = test_case[2][2]
+    # theta4 = test_case[2][3]
+    # theta5 = test_case[2][4]
+    # theta6 = test_case[2][5]
+
     ## For additional debugging add your forward kinematics here. Use your previously calculated thetas
     ## as the input and output the position of your end effector as your_ee = [x,y,z]
 
@@ -154,8 +183,7 @@ def test_code(test_case):
     print('beta', beta)
     print('gamma', gamma)
 
-    offset = 0.303
-    print('offset', offset)
+    offset = s[d7]
     wc_x = EE[0,3] - offset * EE[0,2]
     wc_y = EE[1,3] - offset * EE[1,2]
     wc_z = EE[2,3] - offset * EE[2,2]
@@ -188,12 +216,12 @@ def test_code(test_case):
     t_4_e = abs(theta4-test_case[2][3])
     t_5_e = abs(theta5-test_case[2][4])
     t_6_e = abs(theta6-test_case[2][5])
-    print ("\nTheta 1 error is: %04.8f" % t_1_e)
-    print ("Theta 2 error is: %04.8f" % t_2_e)
-    print ("Theta 3 error is: %04.8f" % t_3_e)
-    print ("Theta 4 error is: %04.8f" % t_4_e)
-    print ("Theta 5 error is: %04.8f" % t_5_e)
-    print ("Theta 6 error is: %04.8f" % t_6_e)
+    print ("\nTheta 1 error is: %04.8f (%04.8f - %04.8f)" % (t_1_e, theta1, test_case[2][0]))
+    print ("Theta 2 error is: %04.8f (%04.8f - %04.8f)" % (t_2_e, theta2, test_case[2][1]))
+    print ("Theta 3 error is: %04.8f (%04.8f - %04.8f)" % (t_3_e, theta3, test_case[2][2]))
+    print ("Theta 4 error is: %04.8f (%04.8f - %04.8f)" % (t_4_e, theta4, test_case[2][3]))
+    print ("Theta 5 error is: %04.8f (%04.8f - %04.8f)" % (t_5_e, theta5, test_case[2][4]))
+    print ("Theta 6 error is: %04.8f (%04.8f - %04.8f)" % (t_6_e, theta6, test_case[2][5]))
     print ("\n**These theta errors may not be a correct representation of your code, due to the fact \
            \nthat the arm can have muliple positions. It is best to add your forward kinmeatics to \
            \nconfirm whether your code is working or not**")
@@ -215,6 +243,6 @@ def test_code(test_case):
 
 if __name__ == "__main__":
     # Change test case number for different scenarios
-    test_case_number = 2
+    test_case_number = 3
 
     test_code(test_cases[test_case_number])
