@@ -62,10 +62,9 @@ def test_code(test_case):
     req = Pose(comb)
     start_time = time()
 
-    ########################################################################################
-    ##
+    #########################################################################################
 
-    ## Insert IK code here!
+    ## DH parameter table constants
 
     DH = {
       'th1': 0,     'a0': 0,     'd1': 0.75,  'r0': 0,
@@ -77,52 +76,23 @@ def test_code(test_case):
       'th7': 0,     'a6': 0,     'd7': 0.303, 'r6': 0,
     }
 
-    def loc(a, b, c):
-        print('abc',a,b,c)
-        rad = np.arccos((a**2 + b**2 - c**2) / (2 * a * b))
-        return rad
-    wc_z = test_case[1][2] - DH['d1']
-    wc_xy = np.sqrt(test_case[1][0]**2 + test_case[1][1]**2) - DH['r1']
-    wc_distance = np.sqrt(wc_xy ** 2 + (wc_z) ** 2)
-
-    theta1 = np.arctan2(test_case[1][1],test_case[1][0])
-
-    alpha_a = np.arctan2(wc_z, wc_xy)
-    alpha_b = loc(DH['r2'], wc_distance, DH['d4'])
-    theta2 = -((alpha_a + alpha_b) + DH['th2'])
-    theta3 = -(loc(DH['d4'], DH['r2'], wc_distance) - np.pi/2)
-    theta4 = 0
-    theta5 = 0
-    theta6 = 0
-
+    ########################################################################################
     ##
-    ########################################################################################
 
-    ########################################################################################
-    ## uncomment for testing FK only
-    # theta1 = test_case[2][0]
-    # theta2 = test_case[2][1]
-    # theta3 = test_case[2][2]
-    # theta4 = test_case[2][3]
-    # theta5 = test_case[2][4]
-    # theta6 = test_case[2][5]
-
-    ## For additional debugging add your forward kinematics here. Use your previously calculated thetas
-    ## as the input and output the position of your end effector as your_ee = [x,y,z]
-
+    ## Insert IK code here!
     th1, th2, th3, th4, th5, th6, th7 = symbols('th1:8') # joint variables
     a0, a1, a2, a3, a4, a5, a6 = symbols('a0:7') # twist angles
     d1, d2, d3, d4, d5, d6, d7 = symbols('d1:8') # link offests
     r0, r1, r2, r3, r4, r5, r6 = symbols('r0:7') # link lenghts
 
     s = {
-      th1: theta1,        a0: 0,     d1: 0.75,  r0: 0,
-      th2: theta2 - pi/2, a1: -pi/2, d2: 0,     r1: 0.35,
-      th3: theta3,        a2: 0,     d3: 0,     r2: 1.25,
-      th4: theta4,        a3: -pi/2, d4: 1.5,   r3: -0.054,
-      th5: theta5,        a4: pi/2,  d5: 0,     r4: 0,
-      th6: theta6,        a5: -pi/2, d6: 0,     r5: 0,
-      th7: 0,             a6: 0,     d7: 0.303, r6: 0,
+      th1: th1 + DH['th1'], a0: DH['a0'], d1: DH['d1'], r0: DH['r0'],
+      th2: th2 + DH['th2'], a1: DH['a1'], d2: DH['d2'], r1: DH['r1'],
+      th3: th3 + DH['th3'], a2: DH['a2'], d3: DH['d3'], r2: DH['r2'],
+      th4: th4 + DH['th4'], a3: DH['a3'], d4: DH['d4'], r3: DH['r3'],
+      th5: th5 + DH['th5'], a4: DH['a4'], d5: DH['d5'], r4: DH['r4'],
+      th6: th6 + DH['th6'], a5: DH['a5'], d6: DH['d6'], r5: DH['r5'],
+      th7: th7 + DH['th7'], a6: DH['a6'], d7: DH['d7'], r6: DH['r6'],
     }
 
     def htm(th, a, d, r):
@@ -146,6 +116,87 @@ def test_code(test_case):
     T0_6 = simplify(T0_5 * T5_6)
     T0_G = simplify(T0_6 * T6_G)
 
+    px = req.poses[x].position.x
+    py = req.poses[x].position.y
+    pz = req.poses[x].position.z
+
+    (roll, pitch, yaw) = tf.transformations.euler_from_quaternion(
+        [req.poses[x].orientation.x, req.poses[x].orientation.y,
+            req.poses[x].orientation.z, req.poses[x].orientation.w])
+
+    r, p, y = symbols('r p y')
+    ROT_x = Matrix([[1, 0, 0],
+                    [0, cos(r), -sin(r)],
+                    [0, sin(r), cos(r)]])
+
+    ROT_y = Matrix([[cos(p), 0, sin(p)],
+                    [0, 1, 0],
+                    [-sin(p), 0, cos(p)]])
+
+    ROT_z = Matrix([[cos(y), -sin(y), 0],
+                    [sin(y), cos(y), 0],
+                    [0, 0, 1]])
+    ROT_EE = ROT_z * ROT_y * ROT_x
+    Rot_Error = ROT_z.subs(y, radians(180)) * ROT_y.subs(p, radians(-90))
+    ROT_EE = ROT_EE * Rot_Error
+    ROT_EE = ROT_EE.subs({'r': roll, 'p': pitch, 'y': yaw})
+
+    EE = Matrix([[px], [py], [pz]])
+    WC = EE - (0.303) * ROT_EE[:, 2]
+
+
+    def loc(a, b, c):
+        print('abc',a,b,c)
+        rad = acos((a**2 + b**2 - c**2) / (2 * a * b))
+        return rad
+    wc_z = WC[2] - DH['d1']
+    wc_xy = sqrt(WC[0]**2 + WC[1]**2) - DH['r1']
+    wc_distance = sqrt(wc_xy ** 2 + (wc_z) ** 2)
+
+    theta1 = atan2(WC[1],WC[0])
+
+    alpha_a = atan2(wc_z, wc_xy)
+    alpha_b = loc(DH['r2'], wc_distance, DH['d4'])
+    theta2 = -((alpha_a + alpha_b) + DH['th2'])
+
+    theta3 = -(loc(DH['d4'], DH['r2'], wc_distance) - pi/2)
+
+    R0_3 = T0_1[0:3,0:3] * T1_2[0:3,0:3] * T2_3[0:3,0:3]
+    # R0_3 = R0_3.evalf(subs={th1: theta1 + DH['th1'], th2: theta2 + DH['th2'], th3: theta3 + DH['th3']})
+    R0_3 = R0_3.evalf(subs={th1: theta1, th2: theta2, th3: theta3})
+    R3_6 = R0_3.inv("LU") * ROT_EE
+
+
+    theta4 = atan2(R3_6[2,2], -R3_6[0,2])
+    theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
+    theta6 = atan2(-R3_6[1,1], R3_6[1,0])
+
+
+
+    ##
+    ########################################################################################
+
+    ########################################################################################
+    ## uncomment for testing FK only
+    # theta1 = test_case[2][0]
+    # theta2 = test_case[2][1]
+    # theta3 = test_case[2][2]
+    # theta4 = test_case[2][3]
+    # theta5 = test_case[2][4]
+    # theta6 = test_case[2][5]
+
+    ## For additional debugging add your forward kinematics here. Use your previously calculated thetas
+    ## as the input and output the position of your end effector as your_ee = [x,y,z]
+
+    subs = {
+        th1: theta1,
+        th2: theta2,
+        th3: theta3,
+        th4: theta4,
+        th5: theta5,
+        th6: theta6,
+    }
+
     R_z = Matrix([[cos(pi), -sin(pi), 0, 0],
                   [sin(pi),  cos(pi), 0, 0],
                   [0,  0, 1, 0],
@@ -157,23 +208,14 @@ def test_code(test_case):
     R_corr = simplify(R_z, R_y)
 
     T_total = simplify(T0_G * R_corr)
-
-    subs = {
-        th1: 0,
-        th2: 0,
-        th3: 0,
-        th4: 0,
-        th5: 0,
-        th6: 0,
-    }
-    print('T0_1', T0_1.evalf(subs=subs))
-    print('T0_2', T0_2.evalf(subs=subs))
-    print('T0_3', T0_3.evalf(subs=subs))
-    print('T0_4', T0_4.evalf(subs=subs))
-    print('T0_5', T0_5.evalf(subs=subs))
-    print('T0_6', T0_6.evalf(subs=subs))
-    print('T0_G', T0_G.evalf(subs=subs))
-    print('total', T_total.evalf(subs=subs))
+    # print('T0_1', T0_1.evalf(subs=subs))
+    # print('T0_2', T0_2.evalf(subs=subs))
+    # print('T0_3', T0_3.evalf(subs=subs))
+    # print('T0_4', T0_4.evalf(subs=subs))
+    # print('T0_5', T0_5.evalf(subs=subs))
+    # print('T0_6', T0_6.evalf(subs=subs))
+    # print('T0_G', T0_G.evalf(subs=subs))
+    # print('total', T_total.evalf(subs=subs))
 
     EE = T_total.evalf(subs=subs)
     alpha = atan2(EE[1,0], EE[0,0])
@@ -243,6 +285,6 @@ def test_code(test_case):
 
 if __name__ == "__main__":
     # Change test case number for different scenarios
-    test_case_number = 3
+    test_case_number = 1
 
     test_code(test_cases[test_case_number])
