@@ -17,7 +17,7 @@ from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from geometry_msgs.msg import Pose
 from mpmath import *
 from sympy import *
-
+from calculate_IK import *
 
 def handle_calculate_IK(req):
     rospy.loginfo("Received %s eef-poses from the plan" % len(req.poses))
@@ -25,14 +25,14 @@ def handle_calculate_IK(req):
         print "No valid poses received"
         return -1
     else:
-		
+
         ### Your FK code here
         # Create symbols
 	#
-	#   
+	#
 	# Create Modified DH parameters
 	#
-	#            
+	#
 	# Define Modified DH Transformation matrix
 	#
 	#
@@ -50,6 +50,14 @@ def handle_calculate_IK(req):
             # IK code starts here
             joint_trajectory_point = JointTrajectoryPoint()
 
+            theta1, theta2, theta3, theta4, theta5, theta6 = calculate_IK(req.poses[x])
+            print('theta1',theta1)
+            print('theta2',theta2)
+            print('theta3',theta3)
+            print('theta4',theta4)
+            print('theta5',theta5)
+            print('theta6',theta6)
+
 	    # Extract end-effector position and orientation from request
 	    # px,py,pz = end-effector position
 	    # roll, pitch, yaw = end-effector orientation
@@ -60,8 +68,8 @@ def handle_calculate_IK(req):
             (roll, pitch, yaw) = tf.transformations.euler_from_quaternion(
                 [req.poses[x].orientation.x, req.poses[x].orientation.y,
                     req.poses[x].orientation.z, req.poses[x].orientation.w])
-     
-            ### Your IK code here 
+
+            ### Your IK code here
 	    # Compensate for rotation discrepancy between DH parameters and Gazebo
 	    #
 	    #
@@ -69,7 +77,7 @@ def handle_calculate_IK(req):
 	    #
 	    #
             ###
-		
+
             # Populate response for the IK request
             # In the next line replace theta1,theta2...,theta6 by your joint angle variables
 	    joint_trajectory_point.positions = [theta1, theta2, theta3, theta4, theta5, theta6]

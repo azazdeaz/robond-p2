@@ -5,6 +5,7 @@ import tf
 import numpy as np
 from sympy.matrices import Matrix
 from sympy import atan2, sqrt
+from kuka_arm.scripts.calculate_IK import *
 
 '''
 Format of test case is [ [[EE position],[EE orientation as quaternions]],[WC location],[joint angles]]
@@ -27,7 +28,6 @@ test_cases = {1:[[[2.16135,-1.42635,1.55109],
                   [-2.99,-0.12,0.94,4.06,1.29,-4.12]],
               4:[],
               5:[]}
-
 
 def test_code(test_case):
     ## Set up code
@@ -62,114 +62,14 @@ def test_code(test_case):
     req = Pose(comb)
     start_time = time()
 
-    #########################################################################################
-
-    ## DH parameter table constants
-
-    DH = {
-      'th1': 0,     'a0': 0,     'd1': 0.75,  'r0': 0,
-      'th2': -pi/2, 'a1': -pi/2, 'd2': 0,     'r1': 0.35,
-      'th3': 0,     'a2': 0,     'd3': 0,     'r2': 1.25,
-      'th4': 0,     'a3': -pi/2, 'd4': 1.5,   'r3': -0.054,
-      'th5': 0,     'a4': pi/2,  'd5': 0,     'r4': 0,
-      'th6': 0,     'a5': -pi/2, 'd6': 0,     'r5': 0,
-      'th7': 0,     'a6': 0,     'd7': 0.303, 'r6': 0,
-    }
 
     ########################################################################################
     ##
 
     ## Insert IK code here!
-    th1, th2, th3, th4, th5, th6, th7 = symbols('th1:8') # joint variables
-    a0, a1, a2, a3, a4, a5, a6 = symbols('a0:7') # twist angles
-    d1, d2, d3, d4, d5, d6, d7 = symbols('d1:8') # link offests
-    r0, r1, r2, r3, r4, r5, r6 = symbols('r0:7') # link lenghts
 
-    s = {
-      th1: th1 + DH['th1'], a0: DH['a0'], d1: DH['d1'], r0: DH['r0'],
-      th2: th2 + DH['th2'], a1: DH['a1'], d2: DH['d2'], r1: DH['r1'],
-      th3: th3 + DH['th3'], a2: DH['a2'], d3: DH['d3'], r2: DH['r2'],
-      th4: th4 + DH['th4'], a3: DH['a3'], d4: DH['d4'], r3: DH['r3'],
-      th5: th5 + DH['th5'], a4: DH['a4'], d5: DH['d5'], r4: DH['r4'],
-      th6: th6 + DH['th6'], a5: DH['a5'], d6: DH['d6'], r5: DH['r5'],
-      th7: th7 + DH['th7'], a6: DH['a6'], d7: DH['d7'], r6: DH['r6'],
-    }
+    theta1, theta2, theta3, theta4, theta5, theta6 = calculate_IK(req.poses[x])
 
-    def htm(th, a, d, r):
-        return Matrix([[cos(th), -sin(th), 0, r],
-                       [sin(th)*cos(a), cos(th)*cos(a), -sin(a), -sin(a)*d],
-                       [sin(th)*sin(a), cos(th)*sin(a), cos(a), cos(a)*d],
-                       [0, 0, 0, 1]])
-
-    T0_1 = htm(th1, a0, d1, r0).subs(s)
-    T1_2 = htm(th2, a1, d2, r1).subs(s)
-    T2_3 = htm(th3, a2, d3, r2).subs(s)
-    T3_4 = htm(th4, a3, d4, r3).subs(s)
-    T4_5 = htm(th5, a4, d5, r4).subs(s)
-    T5_6 = htm(th6, a5, d6, r5).subs(s)
-    T6_G = htm(th7, a6, d7, r6).subs(s)
-
-    T0_2 = simplify(T0_1 * T1_2)
-    T0_3 = simplify(T0_2 * T2_3)
-    T0_4 = simplify(T0_3 * T3_4)
-    T0_5 = simplify(T0_4 * T4_5)
-    T0_6 = simplify(T0_5 * T5_6)
-    T0_G = simplify(T0_6 * T6_G)
-
-    px = req.poses[x].position.x
-    py = req.poses[x].position.y
-    pz = req.poses[x].position.z
-
-    (roll, pitch, yaw) = tf.transformations.euler_from_quaternion(
-        [req.poses[x].orientation.x, req.poses[x].orientation.y,
-            req.poses[x].orientation.z, req.poses[x].orientation.w])
-
-    r, p, y = symbols('r p y')
-    ROT_x = Matrix([[1, 0, 0],
-                    [0, cos(r), -sin(r)],
-                    [0, sin(r), cos(r)]])
-
-    ROT_y = Matrix([[cos(p), 0, sin(p)],
-                    [0, 1, 0],
-                    [-sin(p), 0, cos(p)]])
-
-    ROT_z = Matrix([[cos(y), -sin(y), 0],
-                    [sin(y), cos(y), 0],
-                    [0, 0, 1]])
-    ROT_EE = ROT_z * ROT_y * ROT_x
-    Rot_Error = ROT_z.subs(y, radians(180)) * ROT_y.subs(p, radians(-90))
-    ROT_EE = ROT_EE * Rot_Error
-    ROT_EE = ROT_EE.subs({'r': roll, 'p': pitch, 'y': yaw})
-
-    EE = Matrix([[px], [py], [pz]])
-    WC = EE - (0.303) * ROT_EE[:, 2]
-
-
-    def loc(a, b, c):
-        print('abc',a,b,c)
-        rad = acos((a**2 + b**2 - c**2) / (2 * a * b))
-        return rad
-    wc_z = WC[2] - DH['d1']
-    wc_xy = sqrt(WC[0]**2 + WC[1]**2) - DH['r1']
-    wc_distance = sqrt(wc_xy ** 2 + (wc_z) ** 2)
-
-    theta1 = atan2(WC[1],WC[0])
-
-    alpha_a = atan2(wc_z, wc_xy)
-    alpha_b = loc(DH['r2'], wc_distance, DH['d4'])
-    theta2 = -((alpha_a + alpha_b) + DH['th2'])
-
-    theta3 = -(loc(DH['d4'], DH['r2'], wc_distance) - pi/2)
-
-    R0_3 = T0_1[0:3,0:3] * T1_2[0:3,0:3] * T2_3[0:3,0:3]
-    # R0_3 = R0_3.evalf(subs={th1: theta1 + DH['th1'], th2: theta2 + DH['th2'], th3: theta3 + DH['th3']})
-    R0_3 = R0_3.evalf(subs={th1: theta1, th2: theta2, th3: theta3})
-    R3_6 = R0_3.inv("LU") * ROT_EE
-
-
-    theta4 = atan2(R3_6[2,2], -R3_6[0,2])
-    theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
-    theta6 = atan2(-R3_6[1,1], R3_6[1,0])
 
 
 
@@ -285,6 +185,7 @@ def test_code(test_case):
 
 if __name__ == "__main__":
     # Change test case number for different scenarios
-    test_case_number = 1
 
-    test_code(test_cases[test_case_number])
+    test_code(test_cases[1])
+    test_code(test_cases[2])
+    test_code(test_cases[3])
