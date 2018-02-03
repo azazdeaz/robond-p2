@@ -145,7 +145,7 @@ R0_3 = R0_3.evalf(subs={th1: theta1, th2: theta2, th3: theta3})
 R3_6 = R0_3.inv("LU") * ROT_EE
 
 # calculate theta4-6 using the methods described in lession11/8
-#  Euler angles from toration matrix
+#  Euler angles from Rotation Matrix
 theta4 = atan2(R3_6[2,2], -R3_6[0,2])
 theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
 theta6 = atan2(-R3_6[1,1], R3_6[1,0])
@@ -157,11 +157,20 @@ return theta1, theta2, theta3, theta4, theta5, theta6
 
 #### 1. Fill in the `IK_server.py` file with properly commented python code for calculating Inverse Kinematics based on previously performed Kinematic Analysis. Your code must guide the robot to successfully complete 8/10 pick and place cycles. Briefly discuss the code you implemented and your results.
 
-I moved my calculations into [calculate_IK.py](kuka_arm/scripts/calculate_IK.py) and i import it in `IK_debug.py` and `IK_server.py` as well.
+I moved my calculations into [calculate_IK.py](kuka_arm/scripts/calculate_IK.py) and imported it in both `IK_debug.py` and `IK_server.py`.
 
-Using my implementation, the robot makes a lot of extra movement before it reaches the target position. I think it's because while my resulted thetas are mostly correct they are not always between the joint limits. Although it's quite slow, the robot gets the job done every time :)
+Using my implementation, the robot makes a lot of extra movements before it reaches the target position. I think it's because while my resulted thetas are mostly correct they are not always between the joint limits. Although it's quite slow, the robot gets the job done every time :)
 
 I should think about how to solve this "dancing issue" in the future.
 
 I think i have a basic understanding about the concepts introduced in this lesson, but i'll definitely have to gain deeper knowledge about the math behind inverse kinematics.
+
 ![alt text][image3]
+
+
+
+[//]: # (Image References)
+
+[image1]: ./misc_images/misc1.png
+[image2]: ./misc_images/misc3.png
+[image3]: ./misc_images/misc2.png

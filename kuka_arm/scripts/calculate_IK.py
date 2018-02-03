@@ -89,7 +89,7 @@ def calculate_IK(pose):
     R3_6 = R0_3.inv("LU") * ROT_EE
 
     # calculate theta4-6 using the methods described in lession11/8
-    #  Euler angles from toration matrix
+    #  Euler angles from Rotation Matrix
     theta4 = atan2(R3_6[2,2], -R3_6[0,2])
     theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
     theta6 = atan2(-R3_6[1,1], R3_6[1,0])
