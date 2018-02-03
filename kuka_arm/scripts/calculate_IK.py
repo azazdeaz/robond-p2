@@ -28,26 +28,7 @@ s = {
   th7: th7 + DH['th7'], a6: DH['a6'], d7: DH['d7'], r6: DH['r6'],
 }
 
-def htm(th, a, d, r):
-    return Matrix([[cos(th), -sin(th), 0, r],
-                   [sin(th)*cos(a), cos(th)*cos(a), -sin(a), -sin(a)*d],
-                   [sin(th)*sin(a), cos(th)*sin(a), cos(a), cos(a)*d],
-                   [0, 0, 0, 1]])
 
-T0_1 = htm(th1, a0, d1, r0).subs(s)
-T1_2 = htm(th2, a1, d2, r1).subs(s)
-T2_3 = htm(th3, a2, d3, r2).subs(s)
-T3_4 = htm(th4, a3, d4, r3).subs(s)
-T4_5 = htm(th5, a4, d5, r4).subs(s)
-T5_6 = htm(th6, a5, d6, r5).subs(s)
-T6_G = htm(th7, a6, d7, r6).subs(s)
-
-T0_2 = simplify(T0_1 * T1_2)
-T0_3 = simplify(T0_2 * T2_3)
-T0_4 = simplify(T0_3 * T3_4)
-T0_5 = simplify(T0_4 * T4_5)
-T0_6 = simplify(T0_5 * T5_6)
-T0_G = simplify(T0_6 * T6_G)
 
 def calculate_IK(pose):
     px = pose.position.x
@@ -58,6 +39,7 @@ def calculate_IK(pose):
         [pose.orientation.x, pose.orientation.y,
             pose.orientation.z, pose.orientation.w])
 
+    // Calculate the end effector rotation matrix
     r, p, y = symbols('r p y')
     ROT_x = Matrix([[1, 0, 0],
                     [0, cos(r), -sin(r)],
@@ -76,14 +58,19 @@ def calculate_IK(pose):
     ROT_EE = ROT_EE.subs({'r': roll, 'p': pitch, 'y': yaw})
 
     EE = Matrix([[px], [py], [pz]])
+    // calculate the wrist center
     WC = EE - (0.303) * ROT_EE[:, 2]
 
-
+    # get an angle based on the three sides of a triangle
+    #  using the law of cosines
     def loc(a, b, c):
         rad = acos((a**2 + b**2 - c**2) / (2 * a * b))
         return rad
+    # the height of the wrist center
     wc_z = WC[2] - DH['d1']
+    # the distance of the WC on the xy plane
     wc_xy = sqrt(WC[0]**2 + WC[1]**2) - DH['r1']
+    # the distance of the WC in space
     wc_distance = sqrt(wc_xy ** 2 + (wc_z) ** 2)
 
     theta1 = atan2(WC[1],WC[0])
@@ -94,12 +81,15 @@ def calculate_IK(pose):
 
     theta3 = -(loc(DH['d4'], DH['r2'], wc_distance) - pi/2)
 
+    # extract the rotation matrice from 0-3
     R0_3 = T0_1[0:3,0:3] * T1_2[0:3,0:3] * T2_3[0:3,0:3]
-    # R0_3 = R0_3.evalf(subs={th1: theta1 + DH['th1'], th2: theta2 + DH['th2'], th3: theta3 + DH['th3']})
+    # subtitute theta1-3
     R0_3 = R0_3.evalf(subs={th1: theta1, th2: theta2, th3: theta3})
+    # get the rotation matric from 3-6
     R3_6 = R0_3.inv("LU") * ROT_EE
 
-
+    # calculate theta4-6 using the methods described in lession11/8
+    #  Euler angles from toration matrix
     theta4 = atan2(R3_6[2,2], -R3_6[0,2])
     theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
     theta6 = atan2(-R3_6[1,1], R3_6[1,0])
