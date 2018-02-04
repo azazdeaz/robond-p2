@@ -70,6 +70,8 @@ T0_6 = simplify(T0_5 * T5_6)
 T0_G = simplify(T0_6 * T6_G)
 ```
 
+You can see the derived transfomation matrices in the [matrices.txt](./matrices.txt)
+
 #### 3. Decouple Inverse Kinematics problem into Inverse Position Kinematics and inverse Orientation Kinematics; doing so derive the equations to calculate all individual joint angles.
 
 Using the IK_debug.py, i managed to solve the inverse position on my own, but then i had to look in the walk-through video to calculate the inverse orientation.
@@ -159,7 +161,7 @@ return theta1, theta2, theta3, theta4, theta5, theta6
 
 I moved my calculations into [calculate_IK.py](kuka_arm/scripts/calculate_IK.py) and imported it in both `IK_debug.py` and `IK_server.py`.
 
-Using my implementation, the robot makes a lot of extra movements before it reaches the target position. I think it's because while my resulted thetas are mostly correct they are not always between the joint limits. Although it's quite slow, the robot gets the job done every time :)
+Using my implementation, the robot makes a lot of extra movements before it reaches the target position. I think it's because while my resulted thetas are mostly correct they are not always between the joint limits. Although it's quite slow, the robot gets the job done :)
 
 I should think about how to solve this "dancing issue" in the future.
 

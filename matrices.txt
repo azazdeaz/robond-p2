@@ -1,0 +1,136 @@
+T0_2
+[sin(th2)*cos(th1)  cos(th1)*cos(th2)  -sin(th1)  0.35*cos(th1)]
+[                                                              ]
+[sin(th1)*sin(th2)  sin(th1)*cos(th2)  cos(th1)   0.35*sin(th1)]
+[                                                              ]
+[    cos(th2)           -sin(th2)          0          0.75     ]
+[                                                              ]
+[        0                  0              0            1      ]
+T0_3
+[sin(th2 + th3)*cos(th1)  cos(th1)*cos(th2 + th3)  -sin(th1)  (1.25*sin(th2) + 0.35)*cos(th1)]
+[                                                                                            ]
+[sin(th1)*sin(th2 + th3)  sin(th1)*cos(th2 + th3)  cos(th1)   (1.25*sin(th2) + 0.35)*sin(th1)]
+[                                                                                            ]
+[    cos(th2 + th3)           -sin(th2 + th3)          0           1.25*cos(th2) + 0.75      ]
+[                                                                                            ]
+[           0                        0                 0                     1               ]
+T0_4
+[sin(th1)*sin(th4) + sin(th2 + th3)*cos(th1)*cos(th4)  sin(th1)*cos(th4) - sin(th4)*sin(th2 + th3)*cos(th1)   cos(th1)*cos(th2 + th3)  (1.25*s
+[                                                                                                                                             
+[sin(th1)*sin(th2 + th3)*cos(th4) - sin(th4)*cos(th1)  -sin(th1)*sin(th4)*sin(th2 + th3) - cos(th1)*cos(th4)  sin(th1)*cos(th2 + th3)  (1.25*s
+[                                                                                                                                             
+[              cos(th4)*cos(th2 + th3)                               -sin(th4)*cos(th2 + th3)                     -sin(th2 + th3)           -1
+[                                                                                                                                             
+[                         0                                                      0                                       0                    
+
+in(th2) - 0.054*sin(th2 + th3) + 1.5*cos(th2 + th3) + 0.35)*cos(th1)]
+                                                                    ]
+in(th2) - 0.054*sin(th2 + th3) + 1.5*cos(th2 + th3) + 0.35)*sin(th1)]
+                                                                    ]
+.5*sin(th2 + th3) + 1.25*cos(th2) - 0.054*cos(th2 + th3) + 0.75     ]
+                                                                    ]
+                              1                                     ]
+T0_5
+[(sin(th1)*sin(th4) + sin(th2 + th3)*cos(th1)*cos(th4))*cos(th5) + sin(th5)*cos(th1)*cos(th2 + th3)  -(sin(th1)*sin(th4) + sin(th2 + th3)*cos(
+[                                                                                                                                             
+[(sin(th1)*sin(th2 + th3)*cos(th4) - sin(th4)*cos(th1))*cos(th5) + sin(th1)*sin(th5)*cos(th2 + th3)  -(sin(th1)*sin(th2 + th3)*cos(th4) - sin(
+[                                                                                                                                             
+[                   -sin(th5)*sin(th2 + th3) + cos(th4)*cos(th5)*cos(th2 + th3)                                          -sin(th5)*cos(th4)*co
+[                                                                                                                                             
+[                                                0                                                                                            
+
+th1)*cos(th4))*sin(th5) + cos(th1)*cos(th5)*cos(th2 + th3)  -sin(th1)*cos(th4) + sin(th4)*sin(th2 + th3)*cos(th1)  (1.25*sin(th2) - 0.054*sin(
+                                                                                                                                              
+th4)*cos(th1))*sin(th5) + sin(th1)*cos(th5)*cos(th2 + th3)  sin(th1)*sin(th4)*sin(th2 + th3) + cos(th1)*cos(th4)   (1.25*sin(th2) - 0.054*sin(
+                                                                                                                                              
+s(th2 + th3) - sin(th2 + th3)*cos(th5)                                     sin(th4)*cos(th2 + th3)                      -1.5*sin(th2 + th3) + 
+                                                                                                                                              
+        0                                                                             0                                                       
+
+th2 + th3) + 1.5*cos(th2 + th3) + 0.35)*cos(th1)]
+                                                ]
+th2 + th3) + 1.5*cos(th2 + th3) + 0.35)*sin(th1)]
+                                                ]
+1.25*cos(th2) - 0.054*cos(th2 + th3) + 0.75     ]
+                                                ]
+          1                                     ]
+T0_6
+[((sin(th1)*sin(th4) + sin(th2 + th3)*cos(th1)*cos(th4))*cos(th5) + sin(th5)*cos(th1)*cos(th2 + th3))*cos(th6) + (sin(th1)*cos(th4) - sin(th4)
+[                                                                                                                                             
+[((sin(th1)*sin(th2 + th3)*cos(th4) - sin(th4)*cos(th1))*cos(th5) + sin(th1)*sin(th5)*cos(th2 + th3))*cos(th6) - (sin(th1)*sin(th4)*sin(th2 + 
+[                                                                                                                                             
+[                                   -(sin(th5)*sin(th2 + th3) - cos(th4)*cos(th5)*cos(th2 + th3))*cos(th6) - sin(th4)*sin(th6)*cos(th2 + th3) 
+[                                                                                                                                             
+[                                                                                       0                                                     
+
+*sin(th2 + th3)*cos(th1))*sin(th6)  -((sin(th1)*sin(th4) + sin(th2 + th3)*cos(th1)*cos(th4))*cos(th5) + sin(th5)*cos(th1)*cos(th2 + th3))*sin(
+                                                                                                                                              
+th3) + cos(th1)*cos(th4))*sin(th6)  -((sin(th1)*sin(th2 + th3)*cos(th4) - sin(th4)*cos(th1))*cos(th5) + sin(th1)*sin(th5)*cos(th2 + th3))*sin(
+                                                                                                                                              
+                                                                        (sin(th5)*sin(th2 + th3) - cos(th4)*cos(th5)*cos(th2 + th3))*sin(th6) 
+                                                                                                                                              
+                                                                                                                           0                  
+
+th6) + (sin(th1)*cos(th4) - sin(th4)*sin(th2 + th3)*cos(th1))*cos(th6)  -(sin(th1)*sin(th4) + sin(th2 + th3)*cos(th1)*cos(th4))*sin(th5) + cos
+                                                                                                                                              
+th6) - (sin(th1)*sin(th4)*sin(th2 + th3) + cos(th1)*cos(th4))*cos(th6)  -(sin(th1)*sin(th2 + th3)*cos(th4) - sin(th4)*cos(th1))*sin(th5) + sin
+                                                                                                                                              
+- sin(th4)*cos(th6)*cos(th2 + th3)                                                          -sin(th5)*cos(th4)*cos(th2 + th3) - sin(th2 + th3)
+                                                                                                                                              
+                                                                                                                         0                    
+
+(th1)*cos(th5)*cos(th2 + th3)  (1.25*sin(th2) - 0.054*sin(th2 + th3) + 1.5*cos(th2 + th3) + 0.35)*cos(th1)]
+                                                                                                          ]
+(th1)*cos(th5)*cos(th2 + th3)  (1.25*sin(th2) - 0.054*sin(th2 + th3) + 1.5*cos(th2 + th3) + 0.35)*sin(th1)]
+                                                                                                          ]
+*cos(th5)                           -1.5*sin(th2 + th3) + 1.25*cos(th2) - 0.054*cos(th2 + th3) + 0.75     ]
+                                                                                                          ]
+                                                                    1                                     ]
+T0_G
+[sin(th1)*sin(th4)*cos(th5)*cos(th6 + th7) + sin(th1)*sin(th6 + th7)*cos(th4) - sin(th4)*sin(th2 + th3)*sin(th6 + th7)*cos(th1) + sin(th5)*cos
+[                                                                                                                                             
+[-sin(th1)*sin(th4)*sin(th2 + th3)*sin(th6 + th7) + sin(th1)*sin(th5)*cos(th2 + th3)*cos(th6 + th7) + sin(th1)*sin(th2 + th3)*cos(th4)*cos(th5
+[                                                                                                                                             
+[                                                     -sin(th4)*sin(th6 + th7)*cos(th2 + th3) - sin(th5)*sin(th2 + th3)*cos(th6 + th7) + cos(t
+[                                                                                                                                             
+[                                                                                                                     0                       
+
+(th1)*cos(th2 + th3)*cos(th6 + th7) + sin(th2 + th3)*cos(th1)*cos(th4)*cos(th5)*cos(th6 + th7)   -sin(th1)*sin(th4)*sin(th6 + th7)*cos(th5) + 
+                                                                                                                                              
+)*cos(th6 + th7) - sin(th4)*cos(th1)*cos(th5)*cos(th6 + th7) - sin(th6 + th7)*cos(th1)*cos(th4)  -sin(th1)*sin(th4)*sin(th2 + th3)*cos(th6 + t
+                                                                                                                                              
+h4)*cos(th5)*cos(th2 + th3)*cos(th6 + th7)                                                                                                    
+                                                                                                                                              
+                                                                                                                                              
+
+sin(th1)*cos(th4)*cos(th6 + th7) - sin(th4)*sin(th2 + th3)*cos(th1)*cos(th6 + th7) - sin(th5)*sin(th6 + th7)*cos(th1)*cos(th2 + th3) - sin(th2
+                                                                                                                                              
+h7) - sin(th1)*sin(th5)*sin(th6 + th7)*cos(th2 + th3) - sin(th1)*sin(th2 + th3)*sin(th6 + th7)*cos(th4)*cos(th5) + sin(th4)*sin(th6 + th7)*cos
+                                                                                                                                              
+        -sin(th4)*cos(th2 + th3)*cos(th6 + th7) + sin(th5)*sin(th2 + th3)*sin(th6 + th7) - sin(th6 + th7)*cos(th4)*cos(th5)*cos(th2 + th3)    
+                                                                                                                                              
+                                                                        0                                                                     
+
+ + th3)*sin(th6 + th7)*cos(th1)*cos(th4)*cos(th5)  -(sin(th1)*sin(th4) + sin(th2 + th3)*cos(th1)*cos(th4))*sin(th5) + cos(th1)*cos(th5)*cos(th
+                                                                                                                                              
+(th1)*cos(th5) - cos(th1)*cos(th4)*cos(th6 + th7)  -(sin(th1)*sin(th2 + th3)*cos(th4) - sin(th4)*cos(th1))*sin(th5) + sin(th1)*cos(th5)*cos(th
+                                                                                                                                              
+                                                                       -sin(th5)*cos(th4)*cos(th2 + th3) - sin(th2 + th3)*cos(th5)            
+                                                                                                                                              
+                                                                                                    0                                         
+
+2 + th3)  -0.303*(sin(th1)*sin(th4) + sin(th2 + th3)*cos(th1)*cos(th4))*sin(th5) + (1.25*sin(th2) - 0.054*sin(th2 + th3) + 1.5*cos(th2 + th3) 
+                                                                                                                                              
+2 + th3)  -0.303*(sin(th1)*sin(th2 + th3)*cos(th4) - sin(th4)*cos(th1))*sin(th5) + (1.25*sin(th2) - 0.054*sin(th2 + th3) + 1.5*cos(th2 + th3) 
+                                                                                                                                              
+                                   -0.303*sin(th5)*cos(th4)*cos(th2 + th3) - 0.303*sin(th2 + th3)*cos(th5) - 1.5*sin(th2 + th3) + 1.25*cos(th2
+                                                                                                                                              
+                                                                                                        1                                     
+
++ 0.35)*cos(th1) + 0.303*cos(th1)*cos(th5)*cos(th2 + th3)]
+                                                         ]
++ 0.35)*sin(th1) + 0.303*sin(th1)*cos(th5)*cos(th2 + th3)]
+                                                         ]
+) - 0.054*cos(th2 + th3) + 0.75                          ]
+                                                         ]
+                                                         ]

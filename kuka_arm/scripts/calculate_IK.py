@@ -28,6 +28,29 @@ s = {
   th7: th7 + DH['th7'], a6: DH['a6'], d7: DH['d7'], r6: DH['r6'],
 }
 
+# build a homogeneous transform
+def htm(th, a, d, r):
+    return Matrix([[cos(th), -sin(th), 0, r],
+                   [sin(th)*cos(a), cos(th)*cos(a), -sin(a), -sin(a)*d],
+                   [sin(th)*sin(a), cos(th)*sin(a), cos(a), cos(a)*d],
+                   [0, 0, 0, 1]])
+
+# build the homogeneous transformations for each join
+T0_1 = htm(th1, a0, d1, r0).subs(s)
+T1_2 = htm(th2, a1, d2, r1).subs(s)
+T2_3 = htm(th3, a2, d3, r2).subs(s)
+T3_4 = htm(th4, a3, d4, r3).subs(s)
+T4_5 = htm(th5, a4, d5, r4).subs(s)
+T5_6 = htm(th6, a5, d6, r5).subs(s)
+T6_G = htm(th7, a6, d7, r6).subs(s)
+
+# compose transformations between joints
+T0_2 = simplify(T0_1 * T1_2)
+T0_3 = simplify(T0_2 * T2_3)
+T0_4 = simplify(T0_3 * T3_4)
+T0_5 = simplify(T0_4 * T4_5)
+T0_6 = simplify(T0_5 * T5_6)
+T0_G = simplify(T0_6 * T6_G)
 
 
 def calculate_IK(pose):
@@ -39,7 +62,7 @@ def calculate_IK(pose):
         [pose.orientation.x, pose.orientation.y,
             pose.orientation.z, pose.orientation.w])
 
-    // Calculate the end effector rotation matrix
+    # Calculate the end effector rotation matrix
     r, p, y = symbols('r p y')
     ROT_x = Matrix([[1, 0, 0],
                     [0, cos(r), -sin(r)],
@@ -58,7 +81,7 @@ def calculate_IK(pose):
     ROT_EE = ROT_EE.subs({'r': roll, 'p': pitch, 'y': yaw})
 
     EE = Matrix([[px], [py], [pz]])
-    // calculate the wrist center
+    # calculate the wrist center
     WC = EE - (0.303) * ROT_EE[:, 2]
 
     # get an angle based on the three sides of a triangle
