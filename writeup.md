@@ -70,7 +70,7 @@ T0_6 = simplify(T0_5 * T5_6)
 T0_G = simplify(T0_6 * T6_G)
 ```
 
-You can see the derived transfomation matrices in the [matrices.txt](./matrices.txt)
+You can see the derived transfomation matrices in the [matrices.txt](matrices.txt)
 
 #### 3. Decouple Inverse Kinematics problem into Inverse Position Kinematics and inverse Orientation Kinematics; doing so derive the equations to calculate all individual joint angles.
 
@@ -148,9 +148,14 @@ R3_6 = R0_3.inv("LU") * ROT_EE
 
 # calculate theta4-6 using the methods described in lession11/8
 #  Euler angles from Rotation Matrix
-theta4 = atan2(R3_6[2,2], -R3_6[0,2])
 theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
-theta6 = atan2(-R3_6[1,1], R3_6[1,0])
+# choose the best from the two possible solutions
+if sin(theta5) < 0:
+    theta4 = atan2(-R3_6[2,2], R3_6[0,2])
+    theta6 = atan2(R3_6[1,1], -R3_6[1,0])
+else:
+    theta4 = atan2(R3_6[2,2], -R3_6[0,2])
+    theta6 = atan2(-R3_6[1,1], R3_6[1,0])
 
 return theta1, theta2, theta3, theta4, theta5, theta6
 ```

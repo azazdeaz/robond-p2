@@ -113,8 +113,13 @@ def calculate_IK(pose):
 
     # calculate theta4-6 using the methods described in lession11/8
     #  Euler angles from Rotation Matrix
-    theta4 = atan2(R3_6[2,2], -R3_6[0,2])
     theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
-    theta6 = atan2(-R3_6[1,1], R3_6[1,0])
+    # choose the best from the two possible solutions
+    if sin(theta5) < 0:
+        theta4 = atan2(-R3_6[2,2], R3_6[0,2])
+        theta6 = atan2(R3_6[1,1], -R3_6[1,0])
+    else:
+        theta4 = atan2(R3_6[2,2], -R3_6[0,2])
+        theta6 = atan2(-R3_6[1,1], R3_6[1,0])
 
     return theta1, theta2, theta3, theta4, theta5, theta6
